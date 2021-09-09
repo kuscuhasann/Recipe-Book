@@ -1,8 +1,14 @@
 package com.pakt_games.recipebook
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import androidx.fragment.app.Fragment
@@ -15,6 +21,8 @@ import kotlinx.android.synthetic.main.fragment_recipe.*
 
 class RecipeFragment : Fragment() {
 
+    var selectedImage:Uri?=null
+    var selectedBitmap:Bitmap?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +73,56 @@ class RecipeFragment : Fragment() {
             }
         }
 
+    }
+    //Permission Checked
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if(requestCode==1)
+        {
+            if(grantResults.size>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
+            {
+                //Permission Taked
+                val galleryIntent=Intent(Intent.ACTION_PICK,MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+                startActivityForResult(galleryIntent,2)
+            }
+        }
+
+
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+    //Image Gallery Events Checked
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(requestCode==2 && resultCode==Activity.RESULT_OK && data !=null)
+        {
+            selectedImage=data.data
+
+            try {
+                context?.let {
+                    if(selectedImage!=null)
+                    {
+                        if(Build.VERSION.SDK_INT>=28)
+                        {
+                            val source=ImageDecoder.createSource(it!!.contentResolver,selectedImage!!)
+
+                        }
+                        else
+                        {
+                            selectedBitmap=MediaStore.Images.Media.getBitmap(it.contentResolver,selectedImage)
+                        }
+                    }
+
+                }
+
+
+            }catch (e: Exception)
+            {
+                e.printStackTrace()
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
 
