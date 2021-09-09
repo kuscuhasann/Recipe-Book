@@ -106,11 +106,14 @@ class RecipeFragment : Fragment() {
                         if(Build.VERSION.SDK_INT>=28)
                         {
                             val source=ImageDecoder.createSource(it!!.contentResolver,selectedImage!!)
+                            selectedBitmap=ImageDecoder.decodeBitmap(source)
+                            btnImageSelectionId.setImageBitmap(selectedBitmap)
 
                         }
                         else
                         {
                             selectedBitmap=MediaStore.Images.Media.getBitmap(it.contentResolver,selectedImage)
+                            btnImageSelectionId.setImageBitmap(selectedBitmap)
                         }
                     }
 
