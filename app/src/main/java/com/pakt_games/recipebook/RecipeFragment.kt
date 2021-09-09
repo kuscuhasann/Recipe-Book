@@ -17,6 +17,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import kotlinx.android.synthetic.main.fragment_recipe.*
+import java.io.ByteArrayOutputStream
 
 
 class RecipeFragment : Fragment() {
@@ -58,6 +59,33 @@ class RecipeFragment : Fragment() {
         val foodMaterials=edtFoodMetarials.text.toString()
         selectedBitmap.let {
             val lowSizeBitmap=createLowSizeBitmap(selectedBitmap!!,300)
+
+            val outputStream=ByteArrayOutputStream()
+            lowSizeBitmap.compress(Bitmap.CompressFormat.PNG,50,outputStream)
+            val imageByteArray=outputStream.toByteArray()
+
+            try
+            {
+                context.let {
+                    //Create DATABASE
+                    val database=it!!.openOrCreateDatabase("FoodsDb",Context.MODE_PRIVATE,null)
+                    //Create TABLE
+                    database.execSQL("CREATE TABLE IF NOT EXISTS tblFoods(id INTEGER PRIMARY KEY,foodName VARCHAR,foodMaterials VARCHAR, image BLOB) ")
+                    //INDEXING VALUES Not (0,1,2) This indexing (?,?,?)=>(1,2,3)
+                    val sqlString="INSERT INTO FoodsDb(foodName,foodMaterials,image)VALUES (?,?,?)"
+                    val statement=database.compileStatement(sqlString)
+                    statement.bindString(1,foodName)
+                    statement.bindString(2,foodMaterials)
+                    statement.bindBlob(3,imageByteArray)
+                    statement.execute()
+                }
+
+
+            }
+            catch (e:Exception)
+            {
+                e.printStackTrace()
+            }
         }
     }
     fun btnImageSelection(view: View)
