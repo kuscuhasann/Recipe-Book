@@ -54,7 +54,11 @@ class RecipeFragment : Fragment() {
 
     fun btnSaveRecipe(view: View)
     {
-    println("Button Çalışıyoru")
+        val foodName=edtFoodName.text.toString()
+        val foodMaterials=edtFoodMetarials.text.toString()
+        selectedBitmap.let {
+            val lowSizeBitmap=createLowSizeBitmap(selectedBitmap!!,300)
+        }
     }
     fun btnImageSelection(view: View)
     {
@@ -126,6 +130,27 @@ class RecipeFragment : Fragment() {
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    fun createLowSizeBitmap(selectedBitmap: Bitmap,maxSize:Int) :Bitmap
+    {
+        var selectedBitmapWidth=selectedBitmap.width
+        var selectedBitmapHeight=selectedBitmap.height
+
+        var bitmapRatio: Double=selectedBitmapWidth.toDouble()/selectedBitmapHeight.toDouble()
+        if(bitmapRatio>1)
+        {
+          selectedBitmapWidth=maxSize
+          val lowerHeitgh=selectedBitmapWidth/bitmapRatio
+            selectedBitmapHeight  =lowerHeitgh.toInt()
+        }
+        else
+        {
+            selectedBitmapWidth=maxSize
+            val lowerWidth=selectedBitmapHeight/bitmapRatio
+            selectedBitmapWidth  =lowerWidth.toInt()
+        }
+        return Bitmap.createScaledBitmap(selectedBitmap,selectedBitmapWidth,selectedBitmapHeight,true)
     }
 
 
